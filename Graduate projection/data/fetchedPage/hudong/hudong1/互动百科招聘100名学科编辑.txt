@@ -1,0 +1,44 @@
+<Project>hudong</Project>
+<URL>http://w.hudong.com/7e2e658f58b64b238ca0ce5606da8a1e.html</URL>
+<Title>互动百科招聘100名学科编辑</Title>
+<Author>互动百科</Author>
+<ComeFrom>互动百科</ComeFrom>
+<Time>2012-6-7 14:53:08</Time>
+<Content>
+          互动百科招聘100名学科编辑
+            
+              
+                分享到
+                编辑文章
+                
+                  
+                    新知社
+                  
+                  
+                    新浪微博
+                  
+                
+              
+            
+            互动百科（www.hudong.com）是全球最大的中文百科网站，致力于为数亿中文用户免费提供海量、全面、及时的百科知识，并通过全新的维基（wiki）平台不断改善用户对信息的创作、获取和共享方式。截止到2011年11月，互动百科已经发展成为由超过415万用户共同打造的拥有5万个开放分类、583万词条的百科网站。 为进一步提升互动百科内容的权威性、专业性，经公司管理层同意，现向社会各界招募100名学科编辑。  互动百科招聘100名学科编辑 要求： 热爱百科，热心知识传播事业。 在某个学科领域有学习或经历背景。 积极进取、对工作有责任心。 主要工作： 互动百科某个学科的内容体系编辑建设， 对以词条为核心百科内容质量进行管理。 专业认证智愿者的拓展和服务。 优先录取： 经济学、生物、化学、世界史、医学等。 互动百科是个特别的地方，它像座图书馆、更像一座心灵的殿堂。你的加入，将帮助更多的人学习、思考、与人分享知识。 应聘方式： 请将您的简历发至：hr#hudong.com（邮件主题以“姓名+学校+专业+应聘学科编辑”为佳，发送邮件时请将#换成@）。 工作地点在北京，全职。   function google_ad_request_done(google_ads){ var s = ''; var i; if (google_ads.length == 0) { return; } if (google_ads[0].type == "flash") { s += ' ' + '' + '' + ''; }else if (google_ads[0].type == "image") { s += ''; } s += 'google提供的广告'; document.write(s); return; } google_ad_client = "pub-1281461823660189"; google_ad_slot = "9877480992"; google_ad_output = 'js'; google_ad_type = 'image'; google_image_size = '468x60'; google_feedback = 'on';    互动百科的文章（含所附图片）系由网友上传，如果涉嫌侵权，请与客服联系，我们将按照法律之相关规定及时进行处理。如需转载，请注明来源于www.hudong.com。
+            
+              
+                
+                  开放分类：
+                  我来补充
+                
+                
+                  互动百科
+                
+              
+              
+                
+                  开放分类：
+                
+                
+                    
+                  [删除]
+                
+              
+            
+          </Content>

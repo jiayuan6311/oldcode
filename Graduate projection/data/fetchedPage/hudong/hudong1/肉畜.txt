@@ -1,0 +1,10 @@
+<Project>hudong</Project>
+<URL>http://www.hudong.com/wiki/%E8%82%89%E7%95%9C</URL>
+<Title>肉畜</Title>
+<Author>飞扬大穹</Author>
+<ComeFrom>互动百科</ComeFrom>
+<Time>2012-6-7 14:53:02</Time>
+<Content>
+  肉畜 -
+  简介
+  拼音：rouchu解释：1、供食用的牲畜，如家猪、肉牛。2、一些SM文化，把冰恋的对象称为肉畜。日本曾经发生过某人寻找异性来割她的身体，用这样的办法来寻求快感，求别人吃她的肉。这是一种变态文化。</Content>

@@ -1,0 +1,278 @@
+package parse;
+import java_cup.runtime.*;
+import java.util.*;
+import Absyn.*;
+
+
+action code {: static Symbo.Symbol sym(String s) {
+	         return Symbo.Symbol.symbol(s);
+	        }
+	    :};
+
+parser code  {: 
+ 
+  Lexer lexer;
+
+  public void syntax_error(java_cup.runtime.Symbol current) {
+   report_error("Syntax error (" + current.sym + ")", current);
+  }
+
+  errormsg.ErrorMsg errorMsg;
+
+  public void report_error(String message, 
+			   Object info) {
+      errorMsg.error((java_cup.runtime.Symbol)info.left, message);
+  }
+
+  public parser(Lexer l, errormsg.ErrorMsg err) {
+    this();
+    errorMsg=err;
+    lexer=l;
+  }
+:};
+
+scan with {: return lexer.nextToken(); :};
+
+
+
+/*---------------terminal---------------*/
+terminal COMMA,COLON,SEMICOLON,LPAREN,RPAREN,LBRACK,RBRACK,LBRACE,RBRACE,DOT,PLUS,MINUS,UMINUS;
+terminal TIMES,DIVIDE,EQ,NE,LT,LE,GT,GE,AND,OR,ASSIGN,IF,THEN,ELSE,WHILE,FOR,TO,DO,LET,IN;
+terminal END,OF,BREAK,NIL,FUNCTION,VAR,TYPE,ARRAY;
+
+terminal String ID, STRING_LITERAL;
+terminal Integer INTEGER_LITERAL;
+/*---------------nonterminal----------*/
+nonterminal Exp expr;
+nonterminal ExpList expr_list,expr_list_opt,expr_seq,expr_seq_opt;
+nonterminal FieldExpList field_list,field_list_opt;
+nonterminal Var lvalue;
+nonterminal DecList dec_list,dec_list_opt;
+nonterminal Dec dec;
+nonterminal Ty type;
+nonterminal FieldList type_fields,type_fields_opt;
+nonterminal Symbol id;
+
+/* -----------------------precedences----------------*/
+precedence nonassoc LBRACK;
+precedence left ELSE;
+precedence left OR;
+precedence left AND;
+precedence nonassoc EQ,NE,LT,LE,GT,GE;
+precedence left PLUS,MINUS;
+precedence left TIMES,DIVIDE;
+precedence left UMINUS;
+
+/*------------------grammar--------------------*/
+start with expr;
+
+expr	::= STRING_LITERAL:s
+			{: RESULT= new StringExp(sleft,s); :}
+			
+			|INTEGER_LITERAL:i
+			{: RESULT = new IntExp(ileft,i); :}
+			
+			|NIL:n
+			{: RESULT = new NilExp(nleft); :}
+			
+			|lvalue:l
+			{: RESULT = new VarExp(lleft,l); :}
+			
+			|MINUS expr:e1 
+			{: RESULT = new OpExp(e1left,new IntExp(e1left,0),1,e1);	:}
+			%prec UMINUS
+			
+			|expr:e1 PLUS expr:e2
+			{: RESULT = new OpExp(e1left,e1,0,e2); :}
+			
+			|expr:e1 MINUS expr:e2
+			{: RESULT = new OpExp(e1left,e1,1,e2); :}
+			
+			|expr:e1 TIMES expr:e2
+			{: RESULT = new OpExp(e1left,e1,2,e2); :}
+			
+			|expr:e1 DIVIDE expr:e2
+			{: RESULT = new OpExp(e1left,e1,3,e2); :}
+			
+			|expr:e1 EQ expr:e2
+			{: RESULT = new OpExp(e1left,e1,4,e2); :}
+			
+			|expr:e1 NE expr:e2
+			{: RESULT = new OpExp(e1left,e1,5,e2); :}
+			
+			|expr:e1 LT expr:e2
+			{: RESULT = new OpExp(e1left,e1,6,e2); :}
+			
+			|expr:e1 LE expr:e2
+			{: RESULT = new OpExp(e1left,e1,7,e2); :}
+						
+			|expr:e1 GT expr:e2
+			{: RESULT = new OpExp(e1left,e1,8,e2); :}
+						
+			|expr:e1 GE expr:e2
+			{: RESULT = new OpExp(e1left,e1,9,e2); :}
+			
+			|	expr:e1 AND expr:e2
+				{:	RESULT = new IfExp(e1left,e1,e2,new IntExp(e2left,0));	:}
+				
+			|	expr:e1 OR expr:e2
+				{:	RESULT=new IfExp(e1left,e1,new IntExp(e1left,1),e2);	:}
+			
+			|lvalue:l ASSIGN expr:e
+			{: RESULT = new AssignExp(lleft,l,e); :}
+			
+			|id:i LPAREN expr_list_opt:elo RPAREN
+			{: RESULT = new  CallExp(ileft,i,elo); :}
+			
+			|LPAREN expr_seq_opt:eso RPAREN
+			{: RESULT = new SeqExp(esoleft,eso); :}
+			
+			|id:i LBRACE field_list_opt:flo RBRACE
+			{: RESULT = new RecordExp(ileft,i,flo); :}
+			
+			|id:i LBRACK expr:e1 RBRACK OF expr:e2
+			{: RESULT = new ArrayExp(ileft,i,e1,e2); :}
+			
+			|IF expr:e1 THEN expr:e2
+			{: RESULT = new IfExp(e1left,e1,e2); :}
+			
+			|IF expr:e1 THEN expr:e2 ELSE expr:e3
+			{: RESULT = new IfExp(e1left,e1,e2,e3); :}
+			
+			|WHILE expr:e1 DO expr:e2
+			{: RESULT = new WhileExp(e1left,e1,e2); :}
+			
+			|FOR id:i ASSIGN expr:e1 TO expr:e2 DO expr:e3
+			{: RESULT = new ForExp(ileft,new VarDec(ileft,i,null,e1),e2,e3); :}
+			
+			|BREAK:b
+			{: RESULT = new BreakExp(bleft); :}
+			
+			|LET dec_list_opt:dl IN expr_seq_opt:eso END
+			{: RESULT = new LetExp(dlleft,dl,new SeqExp(esoleft,eso)); :};
+			
+			
+			
+lvalue ::= id:i
+       {: RESULT = new SimpleVar(ileft,i); :}
+       
+       |lvalue:l DOT id:i
+       {: RESULT = new FieldVar(lleft,l,i); :}
+       
+       |lvalue:l LBRACK expr:e RBRACK
+       {: RESULT = new SubscriptVar(lleft,l,e); :};			
+				
+				
+
+expr_list ::=expr:e
+          {: RESULT = new ExpList(e,null); :}
+          
+          |expr:e1 COMMA expr_list:e_list
+          {: RESULT = new ExpList(e1,e_list); :};
+
+        
+          
+expr_list_opt ::=/* null */
+              {: RESULT=null; :}
+              
+              |expr_list:e_list
+              {: RESULT = e_list; :};
+             
+              
+
+expr_seq_opt ::=/* null */
+              {: RESULT=null; :}
+              
+              |expr_seq:e
+              {: RESULT = e; :};    
+              
+              
+              
+expr_seq ::=expr:e
+          {: RESULT = new ExpList(e,null); :}
+          
+         | expr:e1 SEMICOLON expr_seq:eq
+          {: RESULT = new ExpList(e1,eq); :}; 
+          
+  
+                  
+field_list ::= id:i EQ expr:e
+           {: RESULT = new FieldExpList(ileft,i,e,null); :}         
+         
+           |id:i EQ expr:e COMMA field_list:fl
+           {: RESULT = new FieldExpList(ileft,i,e,fl); :};
+           
+           
+           
+field_list_opt ::= /* null */
+               {: RESULT = null; :}
+               
+               |field_list:fl
+               {: RESULT = fl; :};
+         
+         
+         
+dec_list ::=dec:d
+         {: RESULT = new DecList(d,null); :}
+         
+         |dec:d dec_list:dl
+         {: RESULT = new DecList(d,dl); :};
+         
+         
+         
+dec    ::=TYPE id:i EQ type:t               
+       {: RESULT = new TypeDec(ileft,i,t,null); :}
+       /*-----------type dec----------*/  
+       
+       |VAR id:i ASSIGN expr:e
+       {: RESULT = new VarDec(ileft,i,null,e); :}
+       
+       |VAR id:i COLON id:ti ASSIGN expr:e
+       {: RESULT = new VarDec(ileft,i,new NameTy(tileft,ti),e); :}
+       /*-----------var dec------------*/
+       
+       |FUNCTION id:i LPAREN type_fields_opt:tfo RPAREN EQ expr:e
+       {: RESULT = new FunctionDec(ileft,i,tfo,null,e,null); :}
+       
+       |FUNCTION id:i LPAREN type_fields_opt:tfo RPAREN COLON id:ti EQ expr:e
+			 {:	RESULT = new FunctionDec(ileft,i,tfo,new NameTy(tileft,ti),e,null);	:};
+        /*----------func dec----------*/ 
+         
+         
+         
+type    ::=id:i
+        {: RESULT = new NameTy(ileft,i); :}
+        
+        |LBRACE type_fields_opt:tfo RBRACE
+        {: RESULT = new RecordTy(tfoleft,tfo); :}
+        
+        |ARRAY OF id:i
+        {: RESULT = new ArrayTy(ileft,i); :};
+        
+        
+        
+type_fields ::=id:i1 COLON id:i2    
+            {: RESULT = new FieldList(i1left,i1,i2,null); :}  
+            
+            |id:i1 COLON id:i2 COMMA type_fields:tf
+            {: RESULT = new FieldList(i1left,i1,i2,tf); :};
+            
+            
+            
+type_fields_opt ::= /*-------null------*/
+                {: RESULT=null; :}
+                
+                |type_fields:tf
+                {: RESULT = tf; :};
+        
+        
+        
+id		::=	ID:i
+			{: RESULT = sym(i);	:};        
+        
+        
+dec_list_opt	::=	{:	RESULT=null;	:}
+				|	dec_list:d
+					{:	RESULT=d;	:};	        
+                 
+      
